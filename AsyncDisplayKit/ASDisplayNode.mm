@@ -1362,6 +1362,17 @@ static NSInteger incrementIfFound(NSInteger i) {
   return [_view hitTest:point withEvent:event];
 }
 
+- (BOOL)canBecomeFirstResponder {
+  return [_view canBecomeFirstResponder];
+}
+
+- (BOOL)canPerformAction:(SEL)action
+              withSender:(id)sender {
+  return [_view canPerformAction:action withSender:sender];
+}
+
+- (void)copy:(id)sender {}
+
 - (void)setHitTestSlop:(UIEdgeInsets)hitTestSlop
 {
   ASDisplayNodeAssertThreadAffinity(self);

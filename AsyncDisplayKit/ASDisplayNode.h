@@ -372,6 +372,13 @@
  */
 - (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event;
 
+/**
+ * Other forwarded methods
+ */
+- (BOOL)canBecomeFirstResponder;
+- (BOOL)canPerformAction:(SEL)action
+              withSender:(id)sender;
+- (void)copy:(id)sender;
 
 /** @name Converting Between View Coordinate Systems */
 

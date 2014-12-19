@@ -30,6 +30,9 @@
   __unsafe_unretained ASDisplayNode *_node;  // Though UIView has a .node property added via category, since we can add an ivar to a subclass, use that for performance.
   BOOL _inHitTest;
   BOOL _inPointInside;
+  BOOL _canPerformAction;
+  BOOL _canBecomeFirstResponder;
+  BOOL _copy;
 }
 
 @synthesize asyncdisplaykit_node = _node;
@@ -214,6 +217,41 @@
     return result;
   } else {
     return [super pointInside:point withEvent:event];
+  }
+}
+
+- (BOOL)canBecomeFirstResponder {
+  if (!_canBecomeFirstResponder) {
+    _canBecomeFirstResponder = YES;
+    BOOL result = [_node canBecomeFirstResponder];
+    _canBecomeFirstResponder = NO;
+    return result;
+  }
+  else {
+    return [super canBecomeFirstResponder];
+  }
+}
+
+- (BOOL)canPerformAction:(SEL)action
+              withSender:(id)sender {
+  if (!_canPerformAction) {
+    _canPerformAction = YES;
+    BOOL result = [_node canPerformAction:action withSender:sender];
+    _canPerformAction = NO;
+    return result;
+  } else {
+    return [super canPerformAction:action withSender:sender];
+  }
+}
+
+- (void)copy:(id)sender {
+  if (!_copy) {
+    _copy = YES;
+    [_node copy:sender];
+    _copy = NO;
+  }
+  else {
+    return [super copy:sender];
   }
 }
 
