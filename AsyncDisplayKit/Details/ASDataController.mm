@@ -247,7 +247,6 @@ static void *kASDataUpdatingQueueContext = &kASDataUpdatingQueueContext;
     [self asyncUpdateDataWithBlock:^{
       // remove elements
       NSArray *indexPaths = ASIndexPathsForMultidimensionalArrayAtIndexSet(_nodes, indexSet);
-      
       DELETE_NODES(_nodes, indexPaths);
       DELETE_SECTIONS(_nodes, indexSet);
     }];
@@ -490,7 +489,7 @@ static void *kASDataUpdatingQueueContext = &kASDataUpdatingQueueContext;
   __block NSArray *arr = nil;
 
   [self queryDataWithBlock:^{
-    arr = ASFindElementsInMultidimensionalArrayAtIndexPaths(_nodes, indexPaths);
+    arr = ASFindElementsInMultidimensionalArrayAtIndexPaths(_nodes.copy, indexPaths);
   }];
 
   return arr;
