@@ -33,6 +33,11 @@
   BOOL _canPerformAction;
   BOOL _canBecomeFirstResponder;
   BOOL _copy;
+
+  BOOL _touchesBegan;
+  BOOL _touchesCancelled;
+  BOOL _touchesMoved;
+  BOOL _touchesEnded;
 }
 
 @synthesize asyncdisplaykit_node = _node;
@@ -61,7 +66,7 @@
 {
   if (!(self = [super initWithFrame:frame]))
     return nil;
-  
+
   return self;
 }
 
@@ -94,7 +99,7 @@
 {
   // FIXME maybe move this logic into ASDisplayNode addSubnode/removeFromSupernode
   UIView *superview = self.superview;
-  
+
   // If superview's node is different from supernode's view, fix it by setting supernode to the new superview's node.  Got that?
   if (!superview)
     [_node __setSupernode:nil];
@@ -146,7 +151,7 @@
 - (void)setContentMode:(UIViewContentMode)contentMode
 {
   ASDisplayNodeAssert(contentMode != UIViewContentModeRedraw, @"Don't do this. Use needsDisplayOnBoundsChange instead.");
-  
+
   // Do our own mapping so as not to call super and muck up needsDisplayOnBoundsChange. If we're in a production build, fall back to resize if we see redraw
   self.layer.contentsGravity = (contentMode != UIViewContentModeRedraw) ? ASDisplayNodeCAContentsGravityFromUIContentMode(contentMode) : kCAGravityResize;
 }
@@ -154,34 +159,50 @@
 #pragma mark - Event Handling + UIResponder Overrides
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
-  if (_node.methodOverrides & ASDisplayNodeMethodOverrideTouchesBegan) {
+  if (!_touchesBegan && _node.methodOverrides & ASDisplayNodeMethodOverrideTouchesBegan) {
+    _touchesBegan = true;
     [_node touchesBegan:touches withEvent:event];
+    _touchesBegan = false;
   }
-  [super touchesBegan:touches withEvent:event];
+  else {
+    [super touchesBegan:touches withEvent:event];
+  }
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
-  if (_node.methodOverrides & ASDisplayNodeMethodOverrideTouchesMoved) {
+  if (!_touchesMoved && _node.methodOverrides & ASDisplayNodeMethodOverrideTouchesMoved) {
+    _touchesMoved = true;
     [_node touchesMoved:touches withEvent:event];
+    _touchesMoved = false;
   }
-  [super touchesMoved:touches withEvent:event];
+  else {
+    [super touchesMoved:touches withEvent:event];
+  }
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
-  if (_node.methodOverrides & ASDisplayNodeMethodOverrideTouchesEnded) {
+  if (!_touchesEnded && _node.methodOverrides & ASDisplayNodeMethodOverrideTouchesEnded) {
+    _touchesEnded = true;
     [_node touchesEnded:touches withEvent:event];
+    _touchesEnded = false;
   }
-  [super touchesEnded:touches withEvent:event];
+  else {
+    [super touchesEnded:touches withEvent:event];
+  }
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
 {
-  if (_node.methodOverrides & ASDisplayNodeMethodOverrideTouchesCancelled) {
+  if (!_touchesCancelled && _node.methodOverrides & ASDisplayNodeMethodOverrideTouchesCancelled) {
+    _touchesCancelled = true;
     [_node touchesCancelled:touches withEvent:event];
+    _touchesCancelled = false;
   }
-  [super touchesCancelled:touches withEvent:event];
+  else {
+    [super touchesCancelled:touches withEvent:event];
+  }
 }
 
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event
@@ -189,7 +210,7 @@
   // REVIEW: We should optimize these types of messages by setting a boolean in the associated ASDisplayNode subclass if
   // they actually override the method.  Same goes for -pointInside:withEvent: below.  Many UIKit classes use that
   // pattern for meaningful reductions of message send overhead in hot code (especially event handling).
-  
+
   // Set boolean so this method can be re-entrant.  If the node subclass wants to default to / make use of UIView
   // hitTest:, it will call it on the view, which is _ASDisplayView.  After calling into the node, any additional calls
   // should use the UIView implementation of hitTest:
@@ -266,7 +287,7 @@
 - (void)tintColorDidChange
 {
   [super tintColorDidChange];
-  
+
   [_node tintColorDidChange];
 }
 

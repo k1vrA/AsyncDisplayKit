@@ -113,12 +113,12 @@ void ASDisplayNodePerformBlockOnMainThread(void (^block)())
 - (void)_initializeInstance
 {
   _contentsScaleForDisplay = ASDisplayNodeScreenScale();
-  
+
   _displaySentinel = [[ASSentinel alloc] init];
-  
+
   _flags.isInHierarchy = NO;
   _flags.displaysAsynchronously = YES;
-  
+
   // As an optimization, it may be worth a caching system that performs these checks once per class in +initialize (see above).
   _flags.implementsDrawRect = ([[self class] respondsToSelector:@selector(drawRect:withParameters:isCancelled:isRasterizing:)] ? 1 : 0);
   _flags.implementsImageDisplay = ([[self class] respondsToSelector:@selector(displayWithParameters:isCancelled:)] ? 1 : 0);
@@ -146,9 +146,9 @@ void ASDisplayNodePerformBlockOnMainThread(void (^block)())
 {
   if (!(self = [super init]))
     return nil;
-  
+
   [self _initializeInstance];
-  
+
   return self;
 }
 
@@ -158,7 +158,7 @@ void ASDisplayNodePerformBlockOnMainThread(void (^block)())
     return nil;
 
   ASDisplayNodeAssert([viewClass isSubclassOfClass:[UIView class]], @"should initialize with a subclass of UIView");
-  
+
   [self _initializeInstance];
   _viewClass = viewClass;
   _flags.synchronous = ![viewClass isSubclassOfClass:[_ASDisplayView class]];
@@ -170,7 +170,7 @@ void ASDisplayNodePerformBlockOnMainThread(void (^block)())
 {
   if (!(self = [super init]))
     return nil;
-  
+
   ASDisplayNodeAssert([layerClass isSubclassOfClass:[CALayer class]], @"should initialize with a subclass of CALayer");
 
   [self _initializeInstance];
@@ -1052,7 +1052,7 @@ static NSInteger incrementIfFound(NSInteger i) {
       [self willEnterHierarchy];
     }
     _flags.isEnteringHierarchy = NO;
-    
+
     CALayer *layer = self.layer;
     if (!self.layer.contents) {
       [layer setNeedsDisplay];
@@ -1326,21 +1326,25 @@ static NSInteger incrementIfFound(NSInteger i) {
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
     // subclass hook
+  [self.view touchesBegan:touches withEvent:event];
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
     // subclass hook
+  [self.view touchesMoved:touches withEvent:event];
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
     // subclass hook
+  [self.view touchesEnded:touches withEvent:event];
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
 {
     // subclass hook
+  [self.view touchesCancelled:touches withEvent:event];
 }
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
