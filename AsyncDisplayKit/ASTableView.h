@@ -72,6 +72,9 @@
 - (void)reloadRowsAtIndexPaths:(NSArray *)indexPaths withRowAnimation:(UITableViewRowAnimation)animation;
 - (void)moveRowAtIndexPath:(NSIndexPath *)indexPath toIndexPath:(NSIndexPath *)newIndexPath;
 
+
+- (ASCellNode*)nodeAtIndexPath:(NSIndexPath *)indexPath;
+
 @end
 
 

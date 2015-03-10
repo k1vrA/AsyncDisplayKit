@@ -261,6 +261,10 @@ static BOOL _isInterceptedSelector(SEL sel)
   [_dataController moveRowAtIndexPath:indexPath toIndexPath:newIndexPath];
 }
 
+- (ASCellNode*)nodeAtIndexPath:(NSIndexPath *)indexPath {
+  return [_dataController nodeAtIndexPath:indexPath];
+}
+
 #pragma mark -
 #pragma mark Intercepted selectors.
 
