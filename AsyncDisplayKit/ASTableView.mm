@@ -211,15 +211,15 @@ static BOOL _isInterceptedSelector(SEL sel)
                          userInfo:nil] raise];
 }
 
-- (void)beginUpdates
-{
-  [self throwUnimplementedException];
-}
+// - (void)beginUpdates
+// {
+//   [self throwUnimplementedException];
+// }
 
-- (void)endUpdates
-{
-  [self throwUnimplementedException];
-}
+// - (void)endUpdates
+// {
+//   [self throwUnimplementedException];
+// }
 
 - (void)insertSections:(NSIndexSet *)sections withRowAnimation:(UITableViewRowAnimation)animation
 {
