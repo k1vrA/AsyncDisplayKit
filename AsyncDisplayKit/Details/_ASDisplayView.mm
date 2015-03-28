@@ -30,7 +30,6 @@
   __unsafe_unretained ASDisplayNode *_node;  // Though UIView has a .node property added via category, since we can add an ivar to a subclass, use that for performance.
   BOOL _inHitTest;
   BOOL _inPointInside;
-  BOOL _canPerformAction;
   BOOL _canBecomeFirstResponder;
   BOOL _copy;
 }
@@ -61,7 +60,7 @@
 {
   if (!(self = [super initWithFrame:frame]))
     return nil;
-
+  
   return self;
 }
 
@@ -94,7 +93,7 @@
 {
   // FIXME maybe move this logic into ASDisplayNode addSubnode/removeFromSupernode
   UIView *superview = self.superview;
-
+  
   // If superview's node is different from supernode's view, fix it by setting supernode to the new superview's node.  Got that?
   if (!superview)
     [_node __setSupernode:nil];
@@ -146,7 +145,7 @@
 - (void)setContentMode:(UIViewContentMode)contentMode
 {
   ASDisplayNodeAssert(contentMode != UIViewContentModeRedraw, @"Don't do this. Use needsDisplayOnBoundsChange instead.");
-
+  
   // Do our own mapping so as not to call super and muck up needsDisplayOnBoundsChange. If we're in a production build, fall back to resize if we see redraw
   self.layer.contentsGravity = (contentMode != UIViewContentModeRedraw) ? ASDisplayNodeCAContentsGravityFromUIContentMode(contentMode) : kCAGravityResize;
 }
@@ -206,7 +205,6 @@
 - (void)__forwardTouchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
 {
   [super touchesCancelled:touches withEvent:event];
->>>>>>> master
 }
 
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event
@@ -214,7 +212,7 @@
   // REVIEW: We should optimize these types of messages by setting a boolean in the associated ASDisplayNode subclass if
   // they actually override the method.  Same goes for -pointInside:withEvent: below.  Many UIKit classes use that
   // pattern for meaningful reductions of message send overhead in hot code (especially event handling).
-
+  
   // Set boolean so this method can be re-entrant.  If the node subclass wants to default to / make use of UIView
   // hitTest:, it will call it on the view, which is _ASDisplayView.  After calling into the node, any additional calls
   // should use the UIView implementation of hitTest:
@@ -253,18 +251,6 @@
   }
 }
 
-- (BOOL)canPerformAction:(SEL)action
-              withSender:(id)sender {
-  if (!_canPerformAction) {
-    _canPerformAction = YES;
-    BOOL result = [_node canPerformAction:action withSender:sender];
-    _canPerformAction = NO;
-    return result;
-  } else {
-    return [super canPerformAction:action withSender:sender];
-  }
-}
-
 - (void)copy:(id)sender {
   if (!_copy) {
     _copy = YES;
@@ -291,14 +277,8 @@
 - (void)tintColorDidChange
 {
   [super tintColorDidChange];
-
+  
   [_node tintColorDidChange];
-}
-
-- (BOOL)canPerformAction:(SEL)action withSender:(id)sender
-{
-  // We forward responder-chain actions to our node if we can't handle them ourselves. See -targetForAction:withSender:.
-  return ([super canPerformAction:action withSender:sender] || [_node respondsToSelector:action]);
 }
 
 - (id)forwardingTargetForSelector:(SEL)aSelector
