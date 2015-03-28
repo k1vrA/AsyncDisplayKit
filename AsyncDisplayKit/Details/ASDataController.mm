@@ -501,21 +501,10 @@ static void *kASSizingQueueContext = &kASSizingQueueContext;
   return _nodes[indexPath.section][indexPath.row];
 }
 
-<<<<<<< HEAD
-- (NSArray *)nodesAtIndexPaths:(NSArray *)indexPaths {
-  __block NSArray *arr = nil;
-
-  [self queryDataWithBlock:^{
-    arr = ASFindElementsInMultidimensionalArrayAtIndexPaths(_nodes.copy, indexPaths);
-  }];
-
-  return arr;
-=======
 - (NSArray *)nodesAtIndexPaths:(NSArray *)indexPaths
 {
   ASDisplayNodeAssertMainThread();
   return ASFindElementsInMultidimensionalArrayAtIndexPaths(_nodes, [indexPaths sortedArrayUsingSelector:@selector(compare:)]);
->>>>>>> master
 }
 
 @end
