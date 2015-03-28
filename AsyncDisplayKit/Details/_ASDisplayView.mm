@@ -33,11 +33,6 @@
   BOOL _canPerformAction;
   BOOL _canBecomeFirstResponder;
   BOOL _copy;
-
-  BOOL _touchesBegan;
-  BOOL _touchesCancelled;
-  BOOL _touchesMoved;
-  BOOL _touchesEnded;
 }
 
 @synthesize asyncdisplaykit_node = _node;
@@ -159,50 +154,59 @@
 #pragma mark - Event Handling + UIResponder Overrides
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
-  if (!_touchesBegan && _node.methodOverrides & ASDisplayNodeMethodOverrideTouchesBegan) {
-    _touchesBegan = true;
+  if (_node.methodOverrides & ASDisplayNodeMethodOverrideTouchesBegan) {
     [_node touchesBegan:touches withEvent:event];
-    _touchesBegan = false;
-  }
-  else {
+  } else {
     [super touchesBegan:touches withEvent:event];
   }
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
-  if (!_touchesMoved && _node.methodOverrides & ASDisplayNodeMethodOverrideTouchesMoved) {
-    _touchesMoved = true;
+  if (_node.methodOverrides & ASDisplayNodeMethodOverrideTouchesMoved) {
     [_node touchesMoved:touches withEvent:event];
-    _touchesMoved = false;
-  }
-  else {
+  } else {
     [super touchesMoved:touches withEvent:event];
   }
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
-  if (!_touchesEnded && _node.methodOverrides & ASDisplayNodeMethodOverrideTouchesEnded) {
-    _touchesEnded = true;
+  if (_node.methodOverrides & ASDisplayNodeMethodOverrideTouchesEnded) {
     [_node touchesEnded:touches withEvent:event];
-    _touchesEnded = false;
-  }
-  else {
+  } else {
     [super touchesEnded:touches withEvent:event];
   }
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
 {
-  if (!_touchesCancelled && _node.methodOverrides & ASDisplayNodeMethodOverrideTouchesCancelled) {
-    _touchesCancelled = true;
+  if (_node.methodOverrides & ASDisplayNodeMethodOverrideTouchesCancelled) {
     [_node touchesCancelled:touches withEvent:event];
-    _touchesCancelled = false;
-  }
-  else {
+  } else {
     [super touchesCancelled:touches withEvent:event];
   }
+}
+
+- (void)__forwardTouchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+  [super touchesBegan:touches withEvent:event];
+}
+
+- (void)__forwardTouchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+{
+  [super touchesMoved:touches withEvent:event];
+}
+
+- (void)__forwardTouchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+{
+  [super touchesEnded:touches withEvent:event];
+}
+
+- (void)__forwardTouchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
+{
+  [super touchesCancelled:touches withEvent:event];
+>>>>>>> master
 }
 
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event
@@ -289,6 +293,20 @@
   [super tintColorDidChange];
 
   [_node tintColorDidChange];
+}
+
+- (BOOL)canPerformAction:(SEL)action withSender:(id)sender
+{
+  // We forward responder-chain actions to our node if we can't handle them ourselves. See -targetForAction:withSender:.
+  return ([super canPerformAction:action withSender:sender] || [_node respondsToSelector:action]);
+}
+
+- (id)forwardingTargetForSelector:(SEL)aSelector
+{
+  // Ideally, we would implement -targetForAction:withSender: and simply return the node where we don't respond personally.
+  // Unfortunately UIResponder's default implementation of -targetForAction:withSender: doesn't follow its own documentation. It doesn't call -targetForAction:withSender: up the responder chain when -canPerformAction:withSender: fails, but instead merely calls -canPerformAction:withSender: on itself and then up the chain. rdar://20111500.
+  // Consequently, to forward responder-chain actions to our node, we override -canPerformAction:withSender: (used by the chain) to indicate support for responder chain-driven actions that our node supports, and then provide the node as a forwarding target here.
+  return _node;
 }
 
 @end
