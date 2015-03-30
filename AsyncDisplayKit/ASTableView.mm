@@ -262,6 +262,16 @@ static BOOL _isInterceptedSelector(SEL sel)
   [_dataController endUpdates];
 }
 
+- (void)superBeginUpdates
+{
+  [super beginUpdates];
+}
+
+- (void)superEndUpdates
+{
+  [super endUpdates];
+}
+
 
 #pragma mark -
 #pragma mark Editing

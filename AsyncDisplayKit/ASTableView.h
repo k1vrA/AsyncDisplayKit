@@ -86,6 +86,9 @@
 - (void)beginUpdates;
 - (void)endUpdates;
 
+- (void)superBeginUpdates;
+- (void)superEndUpdates;
+
 /**
  * Section updating.
  *
